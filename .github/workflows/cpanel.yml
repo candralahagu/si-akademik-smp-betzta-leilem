@@ -2,7 +2,7 @@ name: Publish Information System to CPanel
 on:
   push:
     branches:
-      - Main
+      - main
 jobs:
   FTP-Deploy-Action:
     name: FTP-Deploy-Action
