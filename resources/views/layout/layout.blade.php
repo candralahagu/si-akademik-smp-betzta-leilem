@@ -152,6 +152,8 @@
                                 Master Database
                             </a>
                             <ul id="biografi" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <li class="sidebar-item">
+                                    <a href="{{route('admin.index')}}" class="sidebar-link">Data Admin</a>
                                 </li>
                                 <li class="sidebar-item">
                                     <a href="{{route('guru.index')}}" class="sidebar-link">Data Guru</a>

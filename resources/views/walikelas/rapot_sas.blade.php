@@ -85,7 +85,7 @@
             <td class="tengah">
                 <h2>PEMERINTAH KABUPATEN DEMAK</h2>
                 <h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
-                <h2>SEKOLAH MENENGAH PERTAMA NEGERI 1 KARANGAWEN</h2>
+                <h2>SEKOLAH MENENGAH PERTAMA BETZATA LEILEM</h2>
                 <b>
                     <span>Jl. Raya Karangawen No: 105 Demak</span>
                     <span>Telp : 024-76719044</span>
