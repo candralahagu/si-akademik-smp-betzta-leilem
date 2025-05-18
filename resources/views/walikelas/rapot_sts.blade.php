@@ -87,11 +87,11 @@
                 <h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
                 <h2>SEKOLAH MENENGAH PERTAMA BETZATA LEILEM</h2>
                 <b>
-                    <span>Jl. Raya Karangawen No: 105 Demak</span>
-                    <span>Telp : 024-76719044</span>
+                    <span>Jl. Leilem Dua, Kec. Sonder</span>
+                    <span>Email : smpbetzata@gmail.com</span>
                     <br>
-                    <span>NPSN : 20319344</span>
-                    <span>NSS : 201032102005</span>
+                    <span>NPSN : 69979717</span>
+                    <span>NSS : 101130617066</span>
                 </b>
             </td>
         </tr>
