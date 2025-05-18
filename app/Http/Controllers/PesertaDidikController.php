@@ -144,14 +144,14 @@ class PesertaDidikController extends Controller
             'date' => 'required|date',
             'semester_id' => 'required|integer',
         ]);
-    
+
         foreach ($request->attendance as $siswaId => $status) {
             AbsensiSiswa::updateOrCreate(
                 ['id_siswa' => $siswaId, 'date' => $request->date],
                 ['status' => $status]
             );
         }
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Presensi berhasil disimpan!',
@@ -183,7 +183,7 @@ class PesertaDidikController extends Controller
     public function bukaLegerNilai($kelasId, $semesterId)
     {
         $user = Auth::user(); // Get the currently logged-in user
-    
+
         $mapelIds = MapelKelas::join('mapels', 'mapels.id', '=', 'mapel_kelas.mapel_id')
             ->where('mapel_kelas.kelas_id', $kelasId)
             ->orderBy('mapels.nama')
@@ -205,7 +205,7 @@ class PesertaDidikController extends Controller
                 ->join('gurus as h', 'h.id', '=', 'g.id_guru')
                 ->join('users as i', 'i.id', '=', 'h.id_user')
                 ->where('i.id', $user->id)
-                
+
                 ->where('g.id', $kelasId)
                 ->where('z.id', $mapelId) // Filter hanya untuk mapel saat ini
                 ->where('z.semester_id', request()->session()->get('semester_id'))
@@ -257,7 +257,7 @@ class PesertaDidikController extends Controller
             $datas['sts'] = $datas['sts']->merge($sts);
             $datas['sas'] = $datas['sas']->merge($sas);
         }
-    
+
         $parents = Mapel::whereNull('guru_id')->pluck('nama', 'id');
 
         // Transform the data
@@ -266,10 +266,10 @@ class PesertaDidikController extends Controller
         $result['sas'] = [];
         foreach($datas as $key_data => $data_collection){
             foreach ($data_collection as $data) {
-                $hasil_akhir = collect([ 
-                    $data->avg_tugas, 
-                    $data->avg_uh, 
-                    $data->avg_sas, 
+                $hasil_akhir = collect([
+                    $data->avg_tugas,
+                    $data->avg_uh,
+                    $data->avg_sas,
                     $data->avg_sts,
                 ])->filter()->avg(); // Hitung rata-rata hanya dari nilai yang tidak null
 
@@ -320,7 +320,7 @@ class PesertaDidikController extends Controller
         }
 
         return view('walikelas.legerNilai', ['data' => $transposed , 'subjects' => $subjects, 'semesterId' => $semesterId]);
-    }    
+    }
 
     public function generateRapotPDF(Request $request)
     {
@@ -333,35 +333,30 @@ class PesertaDidikController extends Controller
         $subjects = $data['subjects'] ?? [];
         $studentName = $data['student_name'] ?? 'Unknown Student';
         $agama = $data['student_religion'] ?? 'Unknown Religion';
-    
+
         $tipe = $data['tipe_penilaian'];
         if ($tipe === 'sts') {
             $tanggal_sts = explode(" - ", $data['tanggal_sts'])[1];
 
             $komentar = $data['komentar'] ?? '';
-            
+
             $parents =Mapel::where('semester_id', $semesterId)->whereNull('guru_id')->get();
             $parentWithChildren = [];
             foreach ($parents as $parent) {
                 $children = Mapel::where('semester_id', $semesterId)
                     ->where('parent', $parent->id)
                     ->pluck('nama')
-                    ->toArray(); 
+                    ->toArray();
 
                 $parentWithChildren[$parent->nama] = $children;
             }
-        
+
             // Initialize komentarRapot
             $komentarRapot = [];
             $newSubjects = [];
 
             foreach ($subjects as $subject => $grades) {
-                if (isset($parentWithChildren[$subject])) {
-                    $subject = array_filter($parentWithChildren[$subject], function($value) use ($agama) {
-                        return strpos($value, $agama) !== false;
-                    });
-                    $subject = reset($subject);
-                }
+
 
                 // Menyimpan subjek baru ke array baru
                 $newSubjects[$subject] = $grades;
@@ -387,14 +382,14 @@ class PesertaDidikController extends Controller
                     })
                     ->groupBy('tps.id', 'tps.nama')
                     ->get();
-            
+
                 // Store the retrieved 'nama' values in komentarRapot
                 foreach ($komentarCK as $komentarItem) {
                     $komentarRapot[$subject][] = $komentarItem->nama;
                 }
-            }        
+            }
             $subjects = $newSubjects;
-            
+
             $rombelData = Kelas::join('kelas_siswa', 'kelas.id', '=', 'kelas_siswa.kelas_id')
                 ->join('siswas', 'siswas.id', '=', 'kelas_siswa.siswa_id')
                 ->join('semesters', 'kelas.id_semester', '=', 'semesters.id')
@@ -436,7 +431,7 @@ class PesertaDidikController extends Controller
                 'komentarRapot' => $komentarRapot,
                 'absensiSummary' => $absensiSummary, // Include absensiSummary in the view
             ]);
-        
+
             // Return the PDF as a stream
             return $pdf->stream("RAPOR TENGAH SEMESTER_".strtoupper($studentName)."_{$siswaData->nisn}.pdf");
 
@@ -449,29 +444,24 @@ class PesertaDidikController extends Controller
                 'prestasi_2' => $data['prestasi_2'] ?? null,
                 'prestasi_3' => $data['prestasi_3'] ?? null,
             ];
-        
+
             $parents =Mapel::where('semester_id', $semesterId)->whereNull('guru_id')->get();
             $parentWithChildren = [];
             foreach ($parents as $parent) {
                 $children = Mapel::where('semester_id', $semesterId)
                     ->where('parent', $parent->id)
                     ->pluck('nama')
-                    ->toArray(); 
+                    ->toArray();
 
                 $parentWithChildren[$parent->nama] = $children;
             }
-        
+
             // Initialize komentarRapot
             $komentarRapot = [];
             $newSubjects = [];
 
             foreach ($subjects as $subject => $grades) {
-                if (isset($parentWithChildren[$subject])) {
-                    $subject = array_filter($parentWithChildren[$subject], function($value) use ($agama) {
-                        return strpos($value, $agama) !== false;
-                    });
-                    $subject = reset($subject);
-                }
+
 
                 // Menyimpan subjek baru ke array baru
                 $newSubjects[$subject] = $grades;
@@ -497,14 +487,14 @@ class PesertaDidikController extends Controller
                     })
                     ->groupBy('tps.id', 'tps.nama')
                     ->get();
-            
+
                 // Store the retrieved 'nama' values in komentarRapot
                 foreach ($komentarCK as $komentarItem) {
                     $komentarRapot[$subject][] = $komentarItem->nama;
                 }
-            }        
+            }
             $subjects = $newSubjects;
-        
+
             // Fetch extracurricular (ekskul) data
             $ekskulData = DB::table('penilaian_ekskuls as a')
                 ->join('kelas as b', 'b.id', '=', 'a.kelas_id')
@@ -514,7 +504,7 @@ class PesertaDidikController extends Controller
                 ->where('d.id', $semesterId)
                 ->select('b.rombongan_belajar', 'a.nilai')
                 ->get();
-            
+
             $rombelData = Kelas::join('kelas_siswa', 'kelas.id', '=', 'kelas_siswa.kelas_id')
                 ->join('siswas', 'siswas.id', '=', 'kelas_siswa.siswa_id')
                 ->join('semesters', 'kelas.id_semester', '=', 'semesters.id')
@@ -568,9 +558,9 @@ class PesertaDidikController extends Controller
                 'prestasi' => $prestasi,
                 'ekskulData' => $ekskulData,
                 'komentarRapot' => $komentarRapot,
-                'absensiSummary' => $absensiSummary, 
+                'absensiSummary' => $absensiSummary,
             ]);
-        
+
             // Return the PDF as a stream
             return $pdf->stream("RAPOR AKHIR SEMESTER_".strtoupper($studentName)."_{$siswaData->nisn}.pdf");
         }
@@ -580,7 +570,7 @@ class PesertaDidikController extends Controller
     public function p5bkIndex(Request $request, $semesterId)
     {
         $user = Auth::user();
-        
+
         // Fetch siswa options for the logged-in user
         $siswaOptions = Siswa::join('kelas_siswa', 'kelas_siswa.siswa_id', '=', 'siswas.id')
             ->join('kelas', 'kelas.id', '=', 'kelas_siswa.kelas_id')
@@ -592,30 +582,30 @@ class PesertaDidikController extends Controller
             ->where('kelas.kelas', '!=', 'Ekskul')
             ->select('siswas.*', 'kelas.rombongan_belajar')
             ->get();
-        
+
         // Fetch P5BK data for the selected semester and siswa
         $p5bk = P5BK::where('semester_id', $semesterId)
             ->whereIn('siswa_id', $siswaOptions->pluck('id'))
             ->get();
-        
+
         return view('walikelas.p5bk', compact('siswaOptions', 'p5bk', 'semesterId'));
     }
-    
+
     // Fetch P5BK data for a specific siswa (AJAX request)
     public function fetchP5BK(Request $request)
     {
         $semesterId = $request->semester_id;
         $siswaId = $request->siswa_id;
-        
+
         // Fetch P5BK data for the selected student and semester
         $p5bkData = P5BK::where('semester_id', $semesterId)
             ->where('siswa_id', $siswaId)
             ->get();
-        
+
         // Return the data as a JSON response
         return response()->json($p5bkData);
-    }    
-    
+    }
+
     // Save P5BK data via AJAX
     public function saveP5BKAjax(Request $request, $semesterId)
     {
@@ -624,7 +614,7 @@ class PesertaDidikController extends Controller
             'capaian' => 'required|array',  // Ensure 'capaian' is an array
             'siswa_id' => 'required|integer',  // Ensure siswa_id is present
         ]);
-    
+
         // Save the data (this is an example, adjust as necessary)
         foreach ($request->capaian as $dimensi => $capaian) {
             P5BK::updateOrCreate(
@@ -639,13 +629,13 @@ class PesertaDidikController extends Controller
                 ]
             );
         }
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Penilaian P5 berhasil disimpan!',
         ]);
     }
-    
+
     public function bukuAbsen($semesterId)
     {
         $user = Auth::user();
@@ -671,7 +661,7 @@ class PesertaDidikController extends Controller
             )
             ->groupBy('b.id', 'b.nama', 'b.nisn')
             ->get();
-    
+
         return view('walikelas.bukuAbsen', compact('students'));
     }
 }

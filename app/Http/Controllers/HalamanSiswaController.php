@@ -16,8 +16,8 @@ class HalamanSiswaController extends Controller
     public function absensi(Request $request)
     {
         $semesterId = $request->session()->get('semester_id');
-        
-        $user = Auth::user(); 
+
+        $user = Auth::user();
         $kelas = Kelas::join('kelas_siswa as ks', 'ks.kelas_id', '=', 'kelas.id')
             ->join('siswas as s', 's.id', '=', 'ks.siswa_id')
             ->join('gurus as g', 'g.id', '=', 'kelas.id_guru')
@@ -34,7 +34,7 @@ class HalamanSiswaController extends Controller
             $dataKelas['nama'] = $kelas->rombongan_belajar;
             $dataKelas['nama_guru'] = ($gelar[0] ? $gelar[0].' ' : '').$kelas->nama.$gelar[1];
         }
-        
+
         $dataAbsensi = AbsensiSiswa::join('siswas as s', 's.id', '=', 'absensi_siswas.id_siswa')
             ->join('kelas_siswa as ks', 'ks.siswa_id', '=', 's.id')
             ->join('kelas as k', 'k.id', '=', 'ks.kelas_id')
@@ -53,7 +53,7 @@ class HalamanSiswaController extends Controller
             ->selectRaw('absensi_siswas.status, COUNT(absensi_siswas.status) as count')
             ->groupBy('absensi_siswas.status')
             ->get();
-                
+
         $absensi = [];
         foreach ($absensiSummary as $record) {
             $absensi[$record->status] = $record->count;
@@ -63,7 +63,7 @@ class HalamanSiswaController extends Controller
     }
 
     public function bukuNilaiSiswa(Request $request)
-    {        
+    {
         $semesterId = $request->session()->get('semester_id');
         $siswa = Siswa::where('id_user', auth()->user()->id)->first();
 
@@ -82,30 +82,30 @@ class HalamanSiswaController extends Controller
                     ->where('mapels.kelas', '!=', 'Ekskul')
                     ->whereNotNull('mapels.guru_id')
                     ->where('kelas.id_semester', $semesterId)
-                    ->where('mapels.nama', 'like', '%' . $siswa->agama . '%');
+                    ;
             })
             ->select('mapels.id', DB::raw("CONCAT(kelas.rombongan_belajar, ' - ', mapels.nama) as nama"))
             ->orderBy('mapels.nama')
             ->distinct()
             ->get();
-        
+
         return view('siswapage.bukunilai', compact('mapels', 'semesterId'));
     }
-    
+
     // Helper method to fetch mapels the user is enrolled in
     // AJAX method to fetch student's scores based on selected mapel
     public function fetchBukuNilai(Request $request)
     {
         $user = Auth::user();
         $idMapel = $request->idMapel; // The selected mapel name from AJAX request
-    
+
         // Fetch data for the student's scores based on selected mapel name
         $penilaians = $this->fetchPenilaianSiswa($user->id, $idMapel);
-    
+
         // Calculate average scores for 'Tugas' and 'UH'
         $nilaiAkhirTugas = number_format($this->calculateAverageScore($penilaians, 'Tugas'), 2);
         $nilaiAkhirUH = number_format($this->calculateAverageScore($penilaians, 'UH'), 2);
-    
+
         // Return the data as JSON for AJAX response
         return response()->json([
             'penilaians' => $penilaians,
@@ -113,7 +113,7 @@ class HalamanSiswaController extends Controller
             'nilaiAkhirUH' => $nilaiAkhirUH,
         ]);
     }
-    
+
     // Helper method to fetch student's scores for a given mapel
     private function fetchPenilaianSiswa($userId, $idMapel)
     {
@@ -135,12 +135,12 @@ class HalamanSiswaController extends Controller
             ->orderBy('p.tanggal', 'desc')
             ->get();
     }
-    
+
     // Helper method to calculate average scores based on tipe ('Tugas' or 'UH')
     private function calculateAverageScore($penilaians, $tipe)
     {
         return $penilaians
             ->where('tipe', $tipe)  // Filter records where tipe is either 'Tugas' or 'UH'
             ->avg('nilai');         // Calculate the average for the 'nilai' column
-    }    
+    }
 }
