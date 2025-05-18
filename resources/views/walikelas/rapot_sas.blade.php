@@ -313,7 +313,7 @@
                 Carbon::setLocale('id');
                 $tanggalSekarang = Carbon::now()->isoFormat('D MMMM YYYY');
             @endphp
-            <td width="40%">Leilem, {{ $tanggalSekarang }}<br>Wali Kelas,</td>
+            <td width="40%">Leilem 2, {{ $tanggalSekarang }}<br>Wali Kelas,</td>
         </tr>
         <tr>
             <td style="padding-top: 70px;">..................................<br><span style="color: white">Space</span></td>
