@@ -12,9 +12,10 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Colors\Rgb\Channels\Red;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Mail;
 
-class SiswaController extends Controller 
+class SiswaController extends Controller
 {
     public function index(){
         $siswas = Siswa::orderBy('nama', 'asc')
@@ -27,7 +28,7 @@ class SiswaController extends Controller
             'file' => 'required|max:2048'
         ]);
         Excel::import(new SiswaImport, $request->file('file'));
-        
+
         return redirect()->route('siswa.index')->with('success', 'File berhasil diimport!');
     }
 
@@ -38,6 +39,13 @@ class SiswaController extends Controller
     public function showImportForm()
     {
         return view('siswa.import');
+    }
+
+    public function exportPdf()
+    {
+        $siswas = Siswa::orderBy('nama')->get();
+        $pdf = Pdf::loadView('siswa.report', compact('siswas'));
+        return $pdf->download('laporan_siswa.pdf');
     }
 
     public function generateUser(Request $request, $siswaId)
@@ -61,7 +69,7 @@ class SiswaController extends Controller
         Mail::send('email.akun', ['username' => $siswa->nisn, 'password' => $request->password], function($message) use($request) {
             $message->to("$request->email");
             $message->subject('Akun SMP anda telah dibuat!');
-        }); 
+        });
 
         // Automatically assign the 'Siswa' role to the new user
         $user->assignRole('Siswa');
@@ -78,7 +86,7 @@ class SiswaController extends Controller
 
         return redirect()->route('siswa.index')->with('success', 'Data berhasil dihapus!');
     }
-    
+
     public function store(Request $request)
     {
         // Validate that only `no_pendaftaran` is required and all other fields are nullable
@@ -105,11 +113,11 @@ class SiswaController extends Controller
             'pekerjaan_wali' => 'nullable|string|max:255',
             'angkatan' => 'nullable|integer',
         ]);
-        
+
         Siswa::create($validated);
 
         return redirect()->route('siswa.index')->with('success', 'Data Siswa berhasil ditambahkan');
-    }   
+    }
     public function update(Request $request, $siswaId)
     {
         // Validate that only `no_pendaftaran` is required and all other fields are nullable
@@ -136,11 +144,11 @@ class SiswaController extends Controller
             'pekerjaan_wali' => 'nullable|string|max:255',
             'angkatan' => 'nullable|integer',
         ]);
-        
+
         $siswa = Siswa::findOrFail($siswaId);
         $siswa->update($validated);
 
         return redirect()->route('siswa.index')->with('success', 'Data Siswa berhasil diubah');
-    }   
+    }
 
 }

@@ -11,7 +11,8 @@
         <div class="card-body" style="background-color: #37B7C3; border-radius: 8px">
             <h2 class="m-0" style="color: #EBF4F6">Peserta Didik</h2>
         </div>
-    </div>
+    </div> <!-- Ini penutup card-body yang sebelumnya belum ditutup -->
+</div>
 
     <!-- Import Modal -->
     <div class="modal fade" data-bs-backdrop="static" tabindex="-1" aria-hidden="true" id="excelModal">
@@ -35,19 +36,20 @@
         </div>
     </div>
 
-    
+
     <!-- Import Button -->
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#excelModal" style="width: 6rem">Impor</button>
     <!-- Ekspor Button -->
     <a target="_blank" href="{{ route('siswa.export') }}" class="btn btn-secondary mb-3 px-3" style="width: 6rem">Ekspor</a>
     <!-- Tambah Button -->
     <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createSiswaModal" style="width: 6rem">Tambah</button>
+    <!-- Catak Button -->
+    <a href="{{ route('siswa.report.pdf') }}" class="btn btn-primary" target="_blank">Cetak PDF</a>
 
-    
-    
-    {{-- toggle to enable "Edit" and "Delete" buttons --}} 
+
+    {{-- toggle to enable "Edit" and "Delete" buttons --}}
     <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>  
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
         <label class="form-check-label" for="flexSwitchCheckDefault">Mode Edit</label>
     </div>
 
@@ -82,7 +84,7 @@
                     <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewSiswaModal-{{ $siswa->id }}" >
                         <i class="fa-solid fa-eye"></i>
                     </button>
-                    
+
                     <!-- Edit Button to trigger modal -->
                     <button type="button" class="btn btn-warning controlled" data-bs-toggle="modal" data-bs-target="#editSiswaModal-{{ $siswa->id }}" >
                         <i class="fa-solid fa-edit"></i>
@@ -455,7 +457,7 @@
 @endsection
 
 @push('script')
-    
+
 @if(session('success'))
 <!-- success alert -->
 <script>

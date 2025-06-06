@@ -10,9 +10,10 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use App\Models\User;
-use Mail; 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Mail;
 
-class GuruController extends Controller 
+class GuruController extends Controller
 {
     public function index(){
         $gurus = Guru::with('user')
@@ -40,6 +41,13 @@ class GuruController extends Controller
 
     public function export() {
         return Excel::download(new GuruExport, 'guru.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        $gurus = Guru::orderBy('nama')->get();
+        $pdf = Pdf::loadView('guru.report', compact('gurus'));
+        return $pdf->download('laporan_guru.pdf');
     }
 
     public function create(Request $request)
@@ -100,9 +108,9 @@ class GuruController extends Controller
     }
 
     public function generateUser(Request $request, $guruId)
-    {   
+    {
         $guru = Guru::findOrFail($guruId);
-        
+
         $request->validate([
             'username' => 'required|string|unique:users,username',
             'password' => 'required|string',
@@ -129,9 +137,9 @@ class GuruController extends Controller
     }
 
     public function editRole(Request $request, $guruId)
-    {   
+    {
         $guru = Guru::findOrFail($guruId);
-        
+
         $request->validate([
             'roles' => 'required'
         ]);

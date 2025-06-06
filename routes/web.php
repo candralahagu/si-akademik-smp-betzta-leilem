@@ -104,7 +104,7 @@ Route::middleware(['auth', 'check_role'])->group(function () {
             Route::put('/store', 'store')->name('siswa.store');
             Route::put('/update/{siswaId}', 'update')->name('siswa.update');
             Route::delete('/delete/{siswaId}', 'delete')->name('siswa.delete');
-
+            Route::get('/report/pdf', 'exportPdf')->name('siswa.report.pdf');
         });
 
         // Guru data routes
@@ -117,6 +117,7 @@ Route::middleware(['auth', 'check_role'])->group(function () {
             Route::delete('/{id}', 'destroy')->name('guru.destroy');
             Route::post('/{guruId}/generate-user', 'generateUser')->name('guru.generateUser');
             Route::post('/{guruId}/edit-role', 'editRole')->name('guru.editRole');
+            Route::get('/report/pdf', 'exportPdf')->name('guru.report.pdf');
         });
 
         // Admin data routes
